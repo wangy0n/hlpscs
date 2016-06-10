@@ -5,19 +5,26 @@
 //AUTHOR:		Fei Han; Yan Azdoud
 //E-MAIL:			fei.han@kaust.edu.sa;  yan.azdoud@kaust.edu.sa
 //===========================================================================
-
+#include "mpi.h"
 #include <string>
 #include "time.h"
 #include "Hns.h"
 using namespace hns;
-
+  int group_size;
+  int myid;
 #include "Input_Reader.h"
 #include "App_Fracture.h"
 #include "App_Damage.h"
-
 int main(int argc, char** argv)
 {
-	//-----------------------------------------------------------------------------------------------------------------------------------------
+
+  //--MPI initialize-----------------------------------------------------
+  MPI_Init (&argc,&argv);
+  MPI_Comm_size(MPI_COMM_WORLD,&group_size);//get total number of the processes
+  MPI_Comm_rank(MPI_COMM_WORLD,&myid); // get the id of one process
+
+	
+//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Read input file name into in_file
 	string in_file;
 	if(argc > 1)		in_file = argv[1];
@@ -97,6 +104,7 @@ int main(int argc, char** argv)
 	hout<<"    Operation done in "<<(int)(it_end-it_begin)<<"secs."<<endl;
 	hout<<"^_^ Input achieves"<<endl<<endl;
 	cout<<"^_^ Input achieves"<<endl<<endl;
+	cout<<"Operation done in"<<(int)(it_end-it_begin)<<"secs."<<endl;//王增加的句子
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Implementation
@@ -170,6 +178,8 @@ int main(int argc, char** argv)
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Close the output stream
 	close_deffo_stream();
+	MPI_Finalize();
 	return 1;
+
 }
 //===========================================================================

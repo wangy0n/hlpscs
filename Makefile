@@ -2,7 +2,7 @@
 CXXFLAGS = -Wall -v -g -O3
 PARFLAGS = -fopenmp -g
 CC	=	gcc
-C++	=	g++
+C++	=	mpicxx
 F77    	=	f77
 
 .SUFFIXES:
@@ -39,7 +39,7 @@ Global_Stiff_Matrix.o : Global_Stiff_Matrix.cpp
 SolveEqu.o : SolveEqu.cpp
 	${C++} ${PARFLAGS} ${CXXFLAGS} $< -c
 		
-# αĿ���ļ�
+# Î±Ä¿±êÎÄ¼þ
 .PHONY : clean
 clean :
 	-rm neca $(objects)

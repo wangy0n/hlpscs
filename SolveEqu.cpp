@@ -5,14 +5,16 @@
 //AUTHOR:		Fei Han
 //E-MAIL:			fei.han@kaust.edu.sa
 //====================================================================================
-
+extern int myid;
+extern int group_size;
+#include"mpi.h"
 #include "SolveEqu.h"
-
 //---------------------------------------------------------------------------
 //紧缩存储刚度矩阵
 int SolveEqu::izig(const vector<Node> &nodes, vector<int> &Iz, vector<int> &Ig)const
 {
-	//iz[i-1], iz[i]中记录与第i个点相关的数据在ig中存储的开始位置和结束位置
+	
+//iz[i-1], iz[i]中记录与第i个点相关的数据在ig中存储的开始位置和结束位置
 	//第一个点的编号最小(没有比它编号还小的节点)，所以iz数据从第二个点(i==1)开始
 	Iz.push_back(0);
 
@@ -373,22 +375,31 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 	//---------------------------------------------------------------------
 	mabvm(N,N1,Iz,Ig,A,X,V);		//CALCULATE PRODUCT A*X0=> AP  
 
-	//---------------------------------------------------------------------
-	for(int i=0; i<N1; i++)		//CALCULATE R0=P0=B-A*X0
+	//----------------------------parallel computing-----------------------------------------
+	for(int i=myid; i<N1; i+=group_size)		//CALCULATE R0=P0=B-A*X0
 	{
 		R[i]=B[i]-V[i];
 		P[i]=R[i];
 	}
-
+	for(int i=0;i<N1;i++)
+	  {
+	    MPI_Bcast(&P[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
+          MPI_Bcast(&R[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
+	  }
+	MPI_Barrier(MPI_COMM_WORLD);
 	//---------------------------------------------------------------------
 	if(bnod_num!= 0) displacement_nonzero_value(0,1,bnod_num,ip,vp,P,R);		//处理位移非零值约束条件
 
-	//---------------------------------------------------------------------
+	//--------------------------parallel computing-------------------------------------------
 	RR0=0.0;
-	for(int i=0; i<N1; i++)			//COMPUTE R(K)*R(K)
+	double MPI_RR0=0.0;
+	for(int i=myid; i<N1; i+=group_size)			//COMPUTE R(K)*R(K)
 	{
-		RR0=RR0+R[i]*R[i];
+		MPI_RR0=MPI_RR0+R[i]*R[i];
 	}
+	//	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Reduce(&MPI_RR0,&RR0,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	MPI_Bcast(&RR0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	R0=sqrt(RR0);
 	//--------------------------------------------------------------------- 
 	//ENTER TO ITERATE                                                
@@ -640,9 +651,12 @@ void SolveEqu::mabvm(const int &N, const int &N1, const vector<int> &Iz, const v
 //U		输入向量
 //V		结果向量
 {
-	for(int i=0; i< N1; i++) V[i]=0.0;		//赋初值
-
-	for(int i=0; i<N; i++)
+vector< double> VV(3*N,0); 
+  for(int i=0; i< N1; i++)
+    {VV[i]=0.0;
+V[i]=0.0;		//赋初值
+    }
+	for(int i=myid; i<N; i+=group_size)
 	{
 		int Ik=6*i+9*Iz[i];                                            
 		int Kh=3*i;
@@ -650,8 +664,8 @@ void SolveEqu::mabvm(const int &N, const int &N1, const vector<int> &Iz, const v
 		{
 			for(int k=0; k<=2; k++)
 			{
-				if(j==2||k==2) V[Kh+j]=V[Kh+j]+AK[Ik+j+k+1]*U[Kh+k];
-				else	V[Kh+j]=V[Kh+j]+AK[Ik+j+k]*U[Kh+k];                              
+				if(j==2||k==2) VV[Kh+j]=VV[Kh+j]+AK[Ik+j+k+1]*U[Kh+k];
+				else	VV[Kh+j]=VV[Kh+j]+AK[Ik+j+k]*U[Kh+k];                              
 			}
 		}
 		if(i==0) continue;
@@ -663,12 +677,45 @@ void SolveEqu::mabvm(const int &N, const int &N1, const vector<int> &Iz, const v
 			{
 				for(int k=0; k<=2; k++)
 				{
-					V[Ia+j]=V[Ia+j]+AK[Ik+3*k+j]*U[Kh+k];                         
-					V[Kh+j]=V[Kh+j]+AK[Ik+3*j+k]*U[Ia+k];                        
+					VV[Ia+j]=VV[Ia+j]+AK[Ik+3*k+j]*U[Kh+k];                         
+					VV[Kh+j]=VV[Kh+j]+AK[Ik+3*j+k]*U[Ia+k];                        
 				}
 			}
 		}
 	}
+
+	//parallel computing codes
+	//MPI_Barrier(MPI_COMM_WORLD);
+	for (int i=0;i<3*N;i++)
+	  // { for(int j=0;j<=2;j++)
+	    {
+	     
+	 MPI_Reduce(&VV[i],&V[i],1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+
+	      // }
+	  }
+	for (int i=0;i<3*N;i++)
+	  // { for(int j=0;j<=2;j++)
+	    {
+	        
+	       MPI_Bcast(&V[i],1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	       // }
+	  }
+	//to test the result of parallel computing
+	// cout<<"N:"<<N<<endl;
+	//	  if( myid==0)
+	// {
+	// for(int i=0;i<N;i++)
+	//	  for(int j=0;j<=2;j++)
+	//	{
+	//	  if(V[3*i+j]!=0)
+		    	    //	{cout<<V[3*i+j]<<"  ";
+			   //     	hout<<V[3*i+j]<<"  ";
+				//  }
+				  //	}
+				//	}
+//if(myid==0)
+// exit(0);
 }
 //---------------------------------------------------------------------------
 //(OpenMP)矩阵AK乘向量U
