@@ -1,0 +1,95 @@
+%-----------------------welcome------------------------------------------------------------------------------------------------------------------------------
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input the name of application case.
+Application_Name
+App_Damage_2D
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input the name of simulation.
+Simulation_Name
+Test
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input effective stiffness of the nonlocal continuum model.
+%the type and Young's modulus, Poisson radio and Shear modulus of every material, one material in one line,
+%where the type equal to ("Isotropic": isotropic; "Transverse": transversely isotropic "Orthotropic": orthotropic) and the units of modulus are the same.
+%The input order in every row likes: Isotropic E; Transverse E1 E2 v2 or Orthotropic E11 E22 E33 Nu12 Nu23 Nu13.
+%For 2D problem, the type equal to ("Isotropic": isotropic; "Orthotropic": orthotropic)
+%The input order in every row likes: Isotropic E; Orthotropic E11 E22 Nu12.
+Nonlocal_Stiffness_2D
+%Orthotropic 100000 300000 0.3
+Isotropic 200000
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input peridynamic(non-local continuum) parameters: the radius of horizon, the intrinsic length and the ratio of broken bond.
+Peridynamic_Parameters
+0.12 0.024 1.2
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input grid sizes for estimating the effective stiffness.
+Nonlocal_Grid_Size
+0.001 0.001 0.001
+%Please the number (0<num<100) of Gauss points in 1D for the effective stiffness.
+Nonlocal_Gauss
+4
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input geometric parameters of RVE: the lower-left corner point of RVE and the length, width and height of RVE.
+RVE_Geometry
+0 0 0 2 1 1
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input grid size of RVE: the size of background grids (length, width and height).
+Grid_Size
+0.04 0.04 0.04
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input parameters of weight function: first input number of weight functions and type of coupling area.
+%if the type is "Null", that denotes no weighting domain at the begining for adaptive algorithm
+%if the type is "Spheres", that denotes the concentric spheres, then the center of spheres (x,y,z) and radius r0 and r1. For example, Spheres 0.5 0.5 0.5 0.2 0.4.
+%if the type is "Cylinder_x(y,z)", that denotes the concentric cylinder with elliptical section. For example, Cylinder_y 0.0 0.5 0.2 0.7 0.4.
+%Cylinder_y means the cylinder is along the y direction, two number (x0, z0) is the center of section in x and z directions respectly, 
+%then two values (a0, a1) are following which are the radius of inner and outer elliptical section and r is the b0/a0=b1/a1=r.
+%After that, please input the shape of weight function, if the shape is "Constant", the value of constant is needed. For example: Constant 0.5.
+%if the shape is "Linear" that denotes linear function; if the shape is "Cubic" that denotes cubic function.
+Weight_Function
+1
+Null Linear
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input parameters of damage. First input the critical parameter of damage (0<d_crit<1), then input k1 and k0, which are the parameters of pseudo potentials. 
+Damage
+1.0 4500 900
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input the type of model and discretization.
+%First keyword denotes the model: "Local" and "Nonlocal" represent only local or nonlocal model; "Hybrid" represents a coupled model by local and nonlocal.
+%Second keyword denotes the numerical discretization: "FEM" and "DGFEM" respectively represent Finite Element Method and Discontinuous Galerkin Finite Element Method.
+Model_Discretization
+Local FEM
+%Hybrid DGFEM
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input parameters of numerical iterative.
+%Please input 1 or 0 at first, "1" means implementing iterative, the maximum number of iteration, the number of ramp and the delta value. 
+%"0" denotes no iteration and the following parameters needn't be input. 
+Iterative
+1 1000 100
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input read or write mode for data backup.
+Read_Write
+%Read
+Write
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please the number (0<num<100) of Gauss points in 1D for gaussian quadrature.
+Gauss
+2
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input the load conditions.
+Load_2D
+0
+%------------------------------------------------------------------------------------------------------------------------------------------------------------
+%Please input the displacement constraint condition: n boundary_case x0 y0 z0 Fixed_displacment_x Fixed_displacement_y. n denotes the number of constraint condition. 
+%if n=0, no constraint; n>1 the later parameters will be inputed n times with different conditions.
+%boundary_case denotes the kind of boundary. boundary_case=Point represents a point, (x0,y0,z0) is the coordinates of this point. 
+%boundary_case=Surface represents a surface, (a,b,c,d) is the coefficents of a plane a*x+b*y+c*z+d=0.
+%boundary_case=Zone represents a cuboid shape, (x0, x1, y0, y1, z0, z1) is the greatest and smallest value respectively in (x,y,z) direction. 
+%Fixed_displacement is a sign denoting the value of fixed displacement will be followed.
+%For 2D problem, boundary_case=Line, then input 4 parameters p0.x, p0.y, p1.x, p1.y
+Displacement_2D
+4
+Line 0 0 0 1 Fixed_displacement_x 0.0
+Line 2 0 2 1 Fixed_displacement_x 0.03
+Line 0 1 2 1 Fixed_displacement_y 0.0
+Line 0 0 2 0 Fixed_displacement_y 0.0
+%Point 0 0 Fixed_displacement_y 0.0
