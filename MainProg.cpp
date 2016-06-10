@@ -10,15 +10,15 @@
 #include "time.h"
 #include "Hns.h"
 using namespace hns;
-  int group_size;
-  int myid;
+int group_size;//The number of processes.
+int myid;// The id of one process.
 #include "Input_Reader.h"
 #include "App_Fracture.h"
 #include "App_Damage.h"
 int main(int argc, char** argv)
 {
 
-  //--MPI initialize-----------------------------------------------------
+  //-------------------------MPI initialize------------------------------------
   MPI_Init (&argc,&argv);
   MPI_Comm_size(MPI_COMM_WORLD,&group_size);//get total number of the processes
   MPI_Comm_rank(MPI_COMM_WORLD,&myid); // get the id of one process
@@ -30,20 +30,22 @@ int main(int argc, char** argv)
 	if(argc > 1)		in_file = argv[1];
 	else
 	{
-		cout << "The input file name is:  ";
-		      
-		in_file = "input.dat";
-      
+	       in_file = "input.dat";
+   if(myid==0)//The 1st if(myid==0).
+	 {
+		cout << "The input file name is:  ";		    
 		cout << in_file << endl;
-		     
+	  }  //The end of the 1st if(myid==0).
 	};
 	//Open the input file
 	ifstream infile;
 	infile.open(in_file.c_str());
 	if(!infile) {
-             
- hout << "Failed to open input file: "  << in_file << endl;  return 0;
-		      
+  if(myid==0)//The 2nd if(myid==0).
+     {
+ hout << "Failed to open input file: "  << in_file << endl; 
+      }  //The end of the 2nd if(myid==0). 
+       return 0;   
                      }
 
 	//Read output file name into out_file
@@ -51,12 +53,13 @@ int main(int argc, char** argv)
 	if(argc > 2)		out_file = argv[2];
 	else
 	{
-		cout << "The output file name is:  ";
-		     
-		out_file = "output.dat";
-          
+                out_file = "output.dat";
+  if(myid==0)//The 3rd if(myid==0).
+     {
+		cout << "The output file name is:  ";		     	       
 		cout << out_file << endl;
-		      
+      }  //The end of the 3rd if(myid==0)
+	      
 	};
 	//Open the output stream
 	if(out_file.size()>0) open_deffo_stream( (char*)out_file.c_str() );
@@ -64,6 +67,8 @@ int main(int argc, char** argv)
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Identification Tag
 
+     if(myid==0)//The 4th if(myid==0).
+     {
 	cout<<endl;
 	cout<<"*************************************************"<<endl;
 	cout<<"*                  NECA   v3.0                  *"<<endl;
@@ -75,7 +80,9 @@ int main(int argc, char** argv)
 	cout<<"*************************************************"<<endl;
 	cout<<endl;
 	cout<<endl;
-
+     }
+     if(myid==0)
+       {hout<<endl;
 	hout<<endl;
 	hout<<"*************************************************"<<endl;
 	hout<<"*                  NECA   v3.0                  *"<<endl;
@@ -87,7 +94,8 @@ int main(int argc, char** argv)
 	hout<<"*************************************************"<<endl;
 	hout<<endl;
 	hout<<endl;
-	  
+     }
+ //The end of the 4th if(myid==0). 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Call for application cases
@@ -98,7 +106,8 @@ int main(int argc, char** argv)
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Input reader
-
+   if(myid==0)//The 5th if(myid==0).
+     {
 	hout<<"======================================================" << endl;
 	hout<<"-_- Input file reader......"<<endl;
 	cout<<endl;
@@ -106,7 +115,8 @@ int main(int argc, char** argv)
 	cout<<"|                Data input                     |"<<endl;
 	cout<<"-------------------------------------------------"<<endl;
 	cout<<endl;
-	  
+  }  
+//The end of the 5th if(myid==0).  
 	Input *Init = new Input;
 	if(Init->Data_Initialization())
 	{ 
@@ -114,12 +124,13 @@ int main(int argc, char** argv)
 	}
 	else return 0;
 	it_end= time(NULL);
-
+   if(myid==0)//The 6th if(myid==0).
+     {
 	hout<<"    Operation done in "<<(int)(it_end-it_begin)<<"secs."<<endl;
 	hout<<"^_^ Input achieves"<<endl<<endl;
 	cout<<"^_^ Input achieves"<<endl<<endl;
 	cout<<"Operation done in"<<(int)(it_end-it_begin)<<"secs."<<endl;//王增加的句子
-	  
+  }  //The end of the 6th if(myid==0).	  
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Implementation
 	if(Init->app_name.str=="App_Fracture")
@@ -150,7 +161,8 @@ int main(int argc, char** argv)
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Time markers for total simulation
 	it_end = time(NULL);
-
+   if(myid==0)//The 7th if(myid==0).
+     {
 	cout<<endl;
 	cout<<"*******************************************************************"<<endl;
 	cout<<"    The simulation took "<<(int)(it_end-it_begin)<<"secs."<<endl;
@@ -189,7 +201,7 @@ int main(int argc, char** argv)
 	hout<<"*************************************************"<<endl;
 	hout<<endl;
 	hout<<endl;
-	  
+     }//The end of the 7th if(myid==0).
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Close the output stream
 	close_deffo_stream();

@@ -52,9 +52,11 @@ int Input::Read_Infile(ifstream &infile)
 		else if(str_temp=="Displacement_2D")	{ if(Read_displacement_2D(displace, infile)==0) return 0; }
 		else if(str_temp=="Force_Disp_TPB_2D")  { if(Read_force_disp_TPB_2D(force_disp, geom_rve, iter.ramp_para, infile)==0) return 0; }
 		else 
-		{ 
-			cout << "Error: the keywords \"" << str_temp << "\" is not defined!" << endl; 
+		  { if(myid==0)
+		      {
+                        cout << "Error: the keywords \"" << str_temp << "\" is not defined!" << endl; 
 			hout << "Error: the keywords \"" << str_temp << "\" is not defined!" << endl; 
+		      }
 			return 0; 
 		}
 
@@ -64,26 +66,26 @@ int Input::Read_Infile(ifstream &infile)
 	cout << "Reading the keywords is finished!" << endl;
 	hout << "Reading the keywords is finished!" << endl;
 	  }
-	if(!app_name.mark) { cout << "Attention: \"Application_Name\" will use default parameters!" << endl; hout << "Attention: \"Application_Name\" will use default parameters!" << endl; }
-	if(!simu_name.mark) {	cout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; hout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; }
-	if(!stif_loc.mark)	{ cout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; hout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; }
-	if(!stif_nonloc.mark) {	cout << "Attention: \"Nonlocal_Stiffness\" will use default parameters!" << endl; hout << "Attention: \"Nonlocal_Stiffness\" will use default parameters!" << endl; }
-	if(!peri_para.mark) {	cout << "Attention: \"Peridynamic_Parameters\" will use default parameters!" << endl; hout << "Attention: \"Peridynamic_Parameters\" will use default parameters!" << endl; }
-	if(!nonloc_gsize.mark) {	cout << "Attention: \"Nonlocal_Grid_Size\" will use default parameters!" << endl; hout << "Attention: \"Nonlocal_Grid_Size\" will use default parameters!" << endl; }
-	if(!nonloc_gau.mark) {	cout << "Attention: \"Nonloca_Gauss\" will use default parameters!" << endl; hout << "Attention: \"Nonloca_Gauss\" will use default parameters!" << endl; }
-	if(!geom_rve.mark) { cout << "Attention: \"RVE_Geometry\" will use default parameters!" << endl; hout << "Attention: \"RVE_Geometry\" will use default parameters!" << endl; }
-	if(!grid_size.mark) {	cout << "Attention: \"Grid_Size\" will use default parameters!" << endl; hout << "Attention: \"Grid_Size\" will use default parameters!" << endl; }
-	if(!weight_func.mark) { cout << "Attention: \"Weight_Function\" will use default parameters!" << endl; hout << "Attention: \"Weight_Function\" will use default parameters!" << endl; }
-	if(!ele_prop.mark) {	cout << "Attention: \"Element_Material_Properties\" will use default parameters!" << endl; hout << "Attention: \"Element_Material_Properties\" will use default parameters!" << endl; }
-	if(!cracks.mark) {	cout << "Attention: \"Crack\" will use default parameters!" << endl; hout << "Attention: \"Crack\" will use default parameters!" << endl; }
-	if(!damages.mark) {	cout << "Attention: \"Damage\" will use default parameters!" << endl; hout << "Attention: \"Damage\" will use default parameters!" << endl; }
-	if(!mod_disc.mark) { cout << "Attention: \"Model_Discretization\" will use default parameters!" << endl; hout << "Attention: \"Model_Discretization\" will use default parameters!" << endl; }
-	if(!iter.mark) {	cout << "Attention: \"Iterative\" will use default parameters!" << endl; hout << "Attention: \"Iterative\" will use default parameters!" << endl; }
-	if(!rw_mod.mark) { cout << "Attention: \"Read_Write\" will use default parameters!" << endl; hout << "Attention: \"Read_Write\" will use default parameters!" << endl; }
-	if(!gauss.mark) { cout << "Attention: \"Gauss\" will use default parameters!" << endl; hout << "Attention: \"Gauss\" will use default parameters!" << endl; }
-	if(!load.mark) {	cout << "Attention: \"Load\" will use default parameters!" << endl; hout << "Attention: \"Load\" will use default parameters!" << endl; }
-	if(!displace.mark) { cout << "Attention: \"Displacement\" will use default parameters!" << endl; hout << "Attention: \"Displacement\" will use default parameters!" << endl; }
-	if(!force_disp.mark) { cout << "Attention: \"Force_Disp_TPB (Three Point Bending)\" will use default parameters!" << endl; hout << "Attention: \"Force_Disp_TPB (Three Point Bending)\" will use default parameters!" << endl; }
+	if(!app_name.mark) { if(myid==0){cout << "Attention: \"Application_Name\" will use default parameters!" << endl; hout << "Attention: \"Application_Name\" will use default parameters!" << endl;} }
+	if(!simu_name.mark) {if(myid==0){ cout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; hout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; }}
+	if(!stif_loc.mark)	{ if(myid==0){cout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; hout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; }}
+	if(!stif_nonloc.mark) {	if(myid==0){cout << "Attention: \"Nonlocal_Stiffness\" will use default parameters!" << endl; hout << "Attention: \"Nonlocal_Stiffness\" will use default parameters!" << endl; }}
+	if(!peri_para.mark) {if(myid==0){  cout << "Attention: \"Peridynamic_Parameters\" will use default parameters!" << endl; hout << "Attention: \"Peridynamic_Parameters\" will use default parameters!" << endl; }}
+	  if(!nonloc_gsize.mark) {  if(myid==0){cout << "Attention: \"Nonlocal_Grid_Size\" will use default parameters!" << endl; hout << "Attention: \"Nonlocal_Grid_Size\" will use default parameters!" << endl; }}
+	  if(!nonloc_gau.mark) {	if(myid==0){cout << "Attention: \"Nonloca_Gauss\" will use default parameters!" << endl; hout << "Attention: \"Nonloca_Gauss\" will use default parameters!" << endl; }}
+	  if(!geom_rve.mark) {if(myid==0){ cout << "Attention: \"RVE_Geometry\" will use default parameters!" << endl; hout << "Attention: \"RVE_Geometry\" will use default parameters!" << endl; }}
+	  if(!grid_size.mark) {if(myid==0){ cout << "Attention: \"Grid_Size\" will use default parameters!" << endl; hout << "Attention: \"Grid_Size\" will use default parameters!" << endl; }}
+	  if(!weight_func.mark) {if(myid==0){ cout << "Attention: \"Weight_Function\" will use default parameters!" << endl; hout << "Attention: \"Weight_Function\" will use default parameters!" << endl; }}
+	  if(!ele_prop.mark) {if(myid==0){ cout << "Attention: \"Element_Material_Properties\" will use default parameters!" << endl; hout << "Attention: \"Element_Material_Properties\" will use default parameters!" << endl; }}
+	  if(!cracks.mark) {if(myid==0){	cout << "Attention: \"Crack\" will use default parameters!" << endl; hout << "Attention: \"Crack\" will use default parameters!" << endl; }}
+	  if(!damages.mark) {if(myid==0){	cout << "Attention: \"Damage\" will use default parameters!" << endl; hout << "Attention: \"Damage\" will use default parameters!" << endl; }}
+	  if(!mod_disc.mark) {if(myid==0){ cout << "Attention: \"Model_Discretization\" will use default parameters!" << endl; hout << "Attention: \"Model_Discretization\" will use default parameters!" << endl; }}
+	  if(!iter.mark) {if(myid==0){	cout << "Attention: \"Iterative\" will use default parameters!" << endl; hout << "Attention: \"Iterative\" will use default parameters!" << endl; }}
+	  if(!rw_mod.mark) {if(myid==0){ cout << "Attention: \"Read_Write\" will use default parameters!" << endl; hout << "Attention: \"Read_Write\" will use default parameters!" << endl; }}
+	  if(!gauss.mark) {if(myid==0){ cout << "Attention: \"Gauss\" will use default parameters!" << endl; hout << "Attention: \"Gauss\" will use default parameters!" << endl; }}
+	  if(!load.mark) {if(myid==0){	cout << "Attention: \"Load\" will use default parameters!" << endl; hout << "Attention: \"Load\" will use default parameters!" << endl; }}
+	  if(!displace.mark) {if(myid==0){ cout << "Attention: \"Displacement\" will use default parameters!" << endl; hout << "Attention: \"Displacement\" will use default parameters!" << endl; }}
+	  if(!force_disp.mark) { if(myid==0){cout << "Attention: \"Force_Disp_TPB (Three Point Bending)\" will use default parameters!" << endl; hout << "Attention: \"Force_Disp_TPB (Three Point Bending)\" will use default parameters!" << endl; }}
 
 	return 1;
 }
@@ -232,10 +234,11 @@ int Input::Data_Initialization()
 	force_disp.cy1 = 0.0;
 	force_disp.czz = 0.0;
 	force_disp.delta_disp = 0.0;
-
+if (myid==0)
+    {
 	cout << "^_^ Data initialization achieves" <<endl<<endl;
 	hout << "^_^ Data initialization achieves" <<endl<<endl;
-
+    }
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -244,8 +247,11 @@ int Input::Read_application_name(struct App_name &app_name, ifstream &infile)
 {
 	if(app_name.mark)
 	{
+if (myid==0)
+    {
 		cout << "Attention: \"" << app_name.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << app_name.keywords << "\" has been input!" << endl;
+    }
 		return 0;
 	}
 	else app_name.mark = true;
@@ -260,7 +266,8 @@ int Input::Read_application_name(struct App_name &app_name, ifstream &infile)
 int Input::Read_simulation_name(struct Simu_name &simu_name, ifstream &infile)
 {
 	if(simu_name.mark)
-	  {if(myid==0)
+	  {
+         if(myid==0)
 	      {
 		cout << "Attention: \"" << simu_name.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << simu_name.keywords << "\" has been input!" << endl;
@@ -279,7 +286,8 @@ int Input::Read_simulation_name(struct Simu_name &simu_name, ifstream &infile)
 int Input::Read_local_stiffness(struct Stif_loc &stif_loc, ifstream &infile)
 {
 	if(stif_loc.mark)
-	  {if(myid==0)
+	  {
+           if(myid==0)
 	      {
 		cout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;

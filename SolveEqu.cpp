@@ -702,7 +702,6 @@ V[i]=0.0;		//∏≥≥ı÷µ
 	// }
 	//MPI_Barrier(MPI_COMM_WORLD);
 
-	//MPI_Bcast(&V,3*N,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	//for (int i=0;i<3*N;i++)
 	  // { for(int j=0;j<=2;j++)
 	      //{

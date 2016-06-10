@@ -14,8 +14,8 @@ int App_Damage::Application_damage_2D(Input *Init)const
 {
  
          clock_t ct0,ct1; //time markers for cpu time of local operations
-         MatBase Material;//由l26移动到此。
-if(myid==0)//第1个if(myid==0)。
+         MatBase Material;
+if(myid==0)//The 1st "if(myid==0)".
 {
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Generate material database
@@ -23,14 +23,15 @@ if(myid==0)//第1个if(myid==0)。
 	cout << "-_- Creating material database..." << endl;
 	hout << "-_- Creating material database..." << endl;
 
-	//MatBase Material;
+	//MatBase Material; // Be moved to other place
 	if(Material.Generate_matbase_2D(Init->stif_nonloc, Init->nonloc_gsize, Init->nonloc_gau.num, Init->damages, Init->peri_para)==0) return 0;
 
 	ct1 = clock();
 	hout << "    The material database built in " << (double)(ct1-ct0)/CLOCKS_PER_SEC << "secs." << endl;
 	hout << "^_^ The material database built successfully!" << endl << endl;
 	cout << "^_^ The material database built successfully!" << endl << endl;
-   }//第1个if(myid==0)结束括号。
+
+   }//The end of the 1st if(myid==0).
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Define displacement solution of every computational step
 	vector<vector<double> > U_tot;
@@ -57,10 +58,9 @@ if(myid==0)//第1个if(myid==0)。
 		vector<vector<double> > Y_force[2];
 		//Full damaged element
 		vector<bool> full_dam_eles;
-
 		//-----------------------------------------------------------------------------------------------------------------------------------------
 		time_t it0 = time(NULL); //Standard time
-if(myid==0)//第2个if(myid==0)。
+if(myid==0)//The 2nd if(myid==0).
 {
 	
 		cout<<endl;
@@ -77,7 +77,8 @@ if(myid==0)//第2个if(myid==0)。
 		hout<<endl;
 		hout<<"-_- Starting interative algorithm..."<<endl;
 		hout<<endl;
- }//第2个if(myid==0)结束括号。
+
+ }//The end of the 2nd if(myid==0).
 		//-----------------------------------------------------------------------------------------------------------------------------------------
 		//Loops
 		int totalcount = 0;
@@ -88,11 +89,11 @@ if(myid==0)//第2个if(myid==0)。
 
 		while(count_ramp<Init->iter.ramp_para)
 		{
-                            //以下参数从内部提前到此。
+                  //以下参数从内部提前到此。
 		  //const double rmp;
-                             Mesher Mesh;
-			 SolveEqu Solv;
-			 vector<int> Iz, Ig;  //Iz and Ig for sparce storage and calculation
+                        Mesher Mesh;
+			SolveEqu Solv;
+		        vector<int> Iz, Ig;  //Iz and Ig for sparce storage and calculation
 			MathMatrix tem_mat(12,12);
 			vector<MathMatrix> ele_self_matrix[2];
 			vector<vector<MathMatrix> > ele_relative_matrix[2];
@@ -101,26 +102,20 @@ if(myid==0)//第2个if(myid==0)。
 			vector<vector<double> > Ak_val; //The values of alpha_key of gaussian points in all elements
 			vector<double> temp_stiff;     //The elastic matrix 6*6 at every gaussian point in a element
 			vector<vector<double> > Ele_local_stiff;
-
 			vector<double> equright;
 			Global_Load_Vector Gloload;
 			int bnod_num;		//the number of nodes on the boundary
 			vector<int> ip;			//the sign of boudary nodes
 			vector<double> vp;	//the value of boudary nodes
-
 			bool flag_break;
 			bool flag_dam;
-
 			int count_iter;
 			int dam_break_order;  //For judging to update damaged elements or broken bonds
 			vector<double> U_Solution;
 			vector<bool> dam_iter;
 			vector<bool> break_iter;
 
-
-
-
-if(myid==0)//第3个if(myid==0).
+if(myid==0)//The 3rd if(myid==0).
 {
 
 			hout<<"--------------------------------------------------------------"<<endl;
@@ -134,7 +129,7 @@ if(myid==0)//第3个if(myid==0).
 			//-----------------------------------------------------------------------------------------------------------------------------------------
 			//The loading ratio of boundary conditions
 			//const double rmp = (double)(count_ramp+1)/Init->iter.ramp_para;
-                            const double  rmp = (double)(count_ramp+1)/Init->iter.ramp_para;
+                         const double  rmp = (double)(count_ramp+1)/Init->iter.ramp_para;
 
 			//-----------------------------------------------------------------------------------------------------------------------------------------
 			//Generate grids of RVE
@@ -142,7 +137,7 @@ if(myid==0)//第3个if(myid==0).
 			cout << "-_- Generating grids of RVE..." << endl;
 			hout << "-_- Generating grids of RVE..." << endl;
 
-			//Mesher Mesh;
+			//Mesher Mesh;//Be moved to other place
 			if(Mesh.Import_mesh_reconfiguration_2D("mesh.dat", Init->mod_disc.disc, full_dam_eles, Init->weight_func) == 0) return 0; //Import mesh data from a file and reconfiguration mesh data(DGFEM)
 
 			ct1 = clock();
@@ -319,7 +314,6 @@ if(myid==0)//第3个if(myid==0).
 
 			 equright.assign(3*Mesh.nodes.size(), 0.0);
 			
-
 			if(Gloload.Gen_global_load_vector_2D(Init->load, rmp, Mesh.nodes, Mesh.elements, equright)==0) return 0;
 
 			ct1 = clock();
@@ -333,10 +327,10 @@ if(myid==0)//第3个if(myid==0).
 			cout <<"-_- Building displacement constraints..." << endl;
 			hout <<"-_- Building displacement constraints..." << endl;
 
-			//int bnod_num = 0;		//the number of nodes on the boundary
-			//vector<int> ip;			//the sign of boudary nodes
-			//vector<double> vp;	//the value of boudary nodes
-                            bnod_num = 0;
+			//int bnod_num = 0;		//the number of nodes on the boundary  //be moved to other place
+			//vector<int> ip;			//the sign of boudary nodes    //be moved to other place
+			//vector<double> vp;	//the value of boudary nodes                   //be moved to other place
+                        bnod_num = 0;
 
 			if(Solv.Fixed_displacement_constraints_2D(Init->displace, rmp, Mesh.nodes, bnod_num, ip, vp)==0) return 0;
 			ct1 = clock();
@@ -357,42 +351,36 @@ if(myid==0)//第3个if(myid==0).
 
 			//-----------------------------------------------------------------------------------------------------------------------------------------
 			//Solving equations and Updating element matrics
-			//bool flag_break = true;
-			//bool flag_dam = true;
+			//bool flag_break = true;  //be moved to other place
+			//bool flag_dam = true;    //be moved to other place
 
-			//int count_iter = 0;
-			//int dam_break_order = 0;  //For judging to update damaged elements or broken bonds
-			//vector<double> U_Solution;
-			//vector<bool> dam_iter(Mesh.elements.size(), false);
-			//vector<bool> break_iter(Mesh.elements.size(), false);
+			//int count_iter = 0;      //be moved to other place
+			//int dam_break_order = 0;  //For judging to update damaged elements or broken bonds //be moved to other place
+			//vector<double> U_Solution; //be moved to other place
+			//vector<bool> dam_iter(Mesh.elements.size(), false);   //be moved to other place
+			//vector<bool> break_iter(Mesh.elements.size(), false); //be moved to other place
 
-			// flag_break = true;
-			// flag_dam = true;
+			// flag_break = true;  //be moved to other place
+			// flag_dam = true;    //be moved to other place
 			alpha_change=false;
-			//	count_iter = 0;
+			// count_iter = 0;   //be moved to other place
 			dam_break_order = 0;  //For judging to update damaged elements or broken bonds
 			dam_iter.assign(Mesh.elements.size(), false);
 			break_iter.assign(Mesh.elements.size(), false);
- }//第3个if(myid==0)结束括号。
+ }//The end of the 3rd if(myid==0)
 
 
-// MPI_Bcast(&count_iter,1,MPI_INT,0,MPI_COMM_WORLD);
-// MPI_Bcast(&flag_dam,1,MPI_INT,0,MPI_COMM_WORLD);
-// MPI_Bcast(&flag_break,1,MPI_INT,0,MPI_COMM_WORLD);
-
-			flag_break = true;
-			 flag_dam = true;		     
-			  count_iter = 0;
-                           int nodes_num;
-                           int Iz_num;
-                           int Ig_num;
-                           int ip_num=0;
-                           int vp_num;
-		           int  total_matrix_num;
-		       	   int equright_num;
-                           int  U_Solution_num;
-			   if(myid==0)
-			     {
+		    	   flag_break = true;
+			   flag_dam = true;		     
+			   count_iter = 0;
+                           int nodes_num;   // define the number of nodes
+                           int Iz_num;     //define the size of Iz
+                           int Ig_num;     //define the size of Ig
+                           int ip_num=0;   //define the size of ip
+                           int vp_num;     //define the size of vp
+		           int  total_matrix_num;   //define the size of total_matrix
+ if(myid==0)//The 4th if(myid==0).
+   {
 				nodes_num=(int)Mesh.nodes.size();
 				Iz_num= (int)Iz.size();
 				Ig_num= (int)Ig.size();
@@ -400,21 +388,21 @@ if(myid==0)//第3个if(myid==0).
 				vp_num= (int)vp.size();
 
 
-			     }
+ }//The end of the 4th if(myid==0).
                                   MPI_Bcast(&Iz_num,1,MPI_INT,0,MPI_COMM_WORLD);
                                   MPI_Bcast(&Ig_num,1,MPI_INT,0,MPI_COMM_WORLD);
                                   MPI_Bcast(&ip_num,1,MPI_INT,0,MPI_COMM_WORLD);
                                   MPI_Bcast(&vp_num,1,MPI_INT,0,MPI_COMM_WORLD);                           
 				  MPI_Bcast(&bnod_num,1,MPI_INT,0,MPI_COMM_WORLD);
 				  MPI_Bcast(&nodes_num,1,MPI_INT,0,MPI_COMM_WORLD);
-if(myid!=0)
+if(myid!=0)//The 1st if(myid!=0).
   {
 			          Iz.assign(Iz_num,0);
 				  Ig.assign(Ig_num,0);
 				  ip.assign(ip_num,0);
 				  vp.assign(vp_num,0.0);
 				  equright.assign(3*nodes_num,0.0);
-  }
+  }//The 1st if(myid!=0).
                                   MPI_Barrier(MPI_COMM_WORLD);
 
 				 MPI_Bcast(&Iz[0],Iz_num,MPI_INT,0,MPI_COMM_WORLD);
@@ -430,7 +418,7 @@ if(myid!=0)
 			  vector<double> total_matrix(6*nodes_num+9*Iz.back(),0.0);
 
 
-if(myid==0)//第4个if(myid==0).
+if(myid==0)//The 5th if(myid==0).
 {
                                 hout<<endl;
 				hout <<"-_- iteration "<<count_iter << " updated item " << dam_break_order%2 <<endl;
@@ -465,80 +453,30 @@ if(myid==0)//第4个if(myid==0).
 				hout << "-_- Solving equations..." << endl;
 
 				Solv.Deal_with_displacement_zero_value(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, equright, total_matrix);
+			        total_matrix_num=(int)total_matrix.size();
 
-				//U_Solution.assign(3*Mesh.nodes.size(), 0.0);
-				// nodes_num=(int)Mesh.nodes.size();
-				// Iz_num= (int)Iz.size();
-				// Ig_num= (int)Ig.size();
-				//ip_num= (int)ip.size();
-				//vp_num= (int)vp.size();
-			          total_matrix_num=(int)total_matrix.size();
-		                // equright_num=(int)equright.size();
-
-
-
-
-
- }//第4个if(myid==0)结束括号。
+ }//The end of the 5th if(myid==0).
                          
-
 				   U_Solution.assign(3*nodes_num, 0.0);
-                                  // MPI_Bcast(&Iz_num,1,MPI_INT,0,MPI_COMM_WORLD);
-                                  //MPI_Bcast(&Ig_num,1,MPI_INT,0,MPI_COMM_WORLD);
-                                  // MPI_Bcast(&ip_num,1,MPI_INT,0,MPI_COMM_WORLD);
-                                  //MPI_Bcast(&vp_num,1,MPI_INT,0,MPI_COMM_WORLD);
-                                  MPI_Bcast(&total_matrix_num,1,MPI_INT,0,MPI_COMM_WORLD);
-				  // MPI_Bcast(&equright_num,1,MPI_INT,0,MPI_COMM_WORLD);
+                                   MPI_Bcast(&total_matrix_num,1,MPI_INT,0,MPI_COMM_WORLD);
 
-				  // MPI_Bcast(&bnod_num,1,MPI_INT,0,MPI_COMM_WORLD);
-				  // MPI_Bcast(&nodes_num,1,MPI_INT,0,MPI_COMM_WORLD);
+	  if(myid!=0)//The 2nd if(myid!=0).
+	 {
+                                  total_matrix.assign(total_matrix_num,0.0);
+	 }//The end of the 2nd if(myid!=0).
 
-				  if(myid!=0)
-				    {total_matrix.assign(total_matrix_num,0.0);
-				    }
-				if(myid==1)				
-				  {
-                                  cout<<"iz_num:"<<Iz_num<<endl;
-				    cout<<"ig_num:"<<Ig_num<<endl;
-                                   cout<<"myid:"<<myid<<endl;
-				    cout<<"vp_num:"<<vp_num<<endl;
-				    cout<<"total_matrix_num:"<<total_matrix_num<<endl;
-                                   cout<<"equright:"<<equright_num<<endl;
-				   cout<<"U_Solution_num3333333333:"<<U_Solution_num<<endl<<endl;
-                                     }
+	       		          MPI_Barrier(MPI_COMM_WORLD);
 
-				MPI_Barrier(MPI_COMM_WORLD);
-
-
-			 if(myid==1)
-			   {
-                                cout<<"bnod_num:"<<bnod_num<<endl;
-			        cout<<"nodes_num:"<<nodes_num<<endl;
-				//cout<<"iz[1]:"<<Iz[1]<<endl;
-				//cout<<"total_matrix[0]:"<<total_matrix[0]<<endl;
-				cout << "-_- Solving equations444..." << endl;
-				hout << "-_- Solving equations444..." << endl;
-			   }
-			 // MPI_Bcast(&Iz[0],Iz_num,MPI_INT,0,MPI_COMM_WORLD);
-			 // MPI_Bcast(&Ig[0],Ig_num,MPI_INT,0,MPI_COMM_WORLD);
-			 // MPI_Bcast(&ip[0],ip_num,MPI_INT,0,MPI_COMM_WORLD);
-			 //MPI_Bcast(&vp[0],vp_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
-			  MPI_Bcast(&total_matrix[0],total_matrix_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
-			  // MPI_Bcast(&equright[0],equright_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
-			  MPI_Bcast(&U_Solution[0],3*nodes_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
+			          MPI_Bcast(&total_matrix[0],total_matrix_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
+			          MPI_Bcast(&U_Solution[0],3*nodes_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
 				
-			 if(myid==1)
-			   {
-                                cout << "-_- Solving equations555..." << endl;
-				hout << "-_- Solving equations555..." << endl;
-			   }
-                 	        MPI_Barrier(MPI_COMM_WORLD);
+                 	          MPI_Barrier(MPI_COMM_WORLD);
 
                                  Solv.Solve_linear_equations(bnod_num, nodes_num, Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
 
 				//Solv.Solve_linear_equations(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
 				//Solv.Solve_linear_equations_omp(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
-if(myid==0)//第5个if(myid==0)
+if(myid==0)//The 6th if(myid==0).
 {
 				ct1 = clock();
 				hout << "    Linear equations solved in " << (double)(ct1 - ct0)/CLOCKS_PER_SEC << "secs." << endl;
@@ -620,7 +558,7 @@ if(myid==0)//第5个if(myid==0)
 				cout << "^_^ Element matrices updated successfully!" << endl << endl;
 				//-------------------------------------------------------------------------------------------------------
 				count_iter++;
-     }//第5个if(myid==0)的结束括号。
+     }//The end of the 6th if(myid==0).
 
                             MPI_Bcast(&count_iter,1,MPI_INT,0,MPI_COMM_WORLD);
                             MPI_Bcast(&flag_dam,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -630,7 +568,7 @@ if(myid==0)//第5个if(myid==0)
 
 			//-----------------------------------------------------------------------------------------------------------------------------------------
 			//Copy variables
-if(myid==0)//第6个if(myid==0)。
+if(myid==0)//The 7th if(myid==0).
 {
 			damage_table[0] = damage_table[1];
 			Y_force[0] = Y_force[1];
@@ -677,7 +615,7 @@ if(myid==0)//第6个if(myid==0)。
 			{
 				//---------------------------------------------------------------------------
 				//Output data
-				Gauss gau;		//gaussian potins
+				Gauss gau;	//gaussian potins
 				if(gau.Generate_gauss_2D(Init->gauss.num)==0) return 0;
 
 				int utsize = (int)U_tot.size();
@@ -722,14 +660,14 @@ if(myid==0)//第6个if(myid==0)。
 			}
 
   }
-//第6个if(myid==0)结束括号。
+//The end of the 7th if(myid==0).
 
                        MPI_Bcast(&count_ramp,1,MPI_INT,0,MPI_COMM_WORLD);
 		}
                //第一个while结束括号。
 
 		//-----------------------------------------------------------------------------------------------------------------------------------------
-if(myid==0)//第7个if(myid==0)。
+if(myid==0)//The 8th if(myid==0).
 {	
                   time_t it1 = time(NULL); //Standard time
 		cout << endl;
@@ -745,12 +683,12 @@ if(myid==0)//第7个if(myid==0)。
 		hout << "Iterative algorithm done successfully!" <<endl;
 		hout << endl;
 
-}//第7个if(myid==0)的结束括号。
+}//The end of the 8th if(myid==0).
 
 	}
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Postprocess
-if(myid==0)//第8个if(myid==0)。
+if(myid==0)//The 9th if(myid==0).
 {
 	ct0 = clock();
 	cout << endl;
@@ -786,7 +724,7 @@ if(myid==0)//第8个if(myid==0)。
 	hout << endl;
 
 	return 1;
-}//第8个if(myid==0)的结束括号。
+}//The end of the 9th if(myid==0).
 }
 int App_Damage::Application_damage(Input *Init)const
 {
