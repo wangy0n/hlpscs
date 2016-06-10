@@ -31,13 +31,20 @@ int main(int argc, char** argv)
 	else
 	{
 		cout << "The input file name is:  ";
+		      
 		in_file = "input.dat";
+      
 		cout << in_file << endl;
+		     
 	};
 	//Open the input file
 	ifstream infile;
 	infile.open(in_file.c_str());
-	if(!infile) { hout << "Failed to open input file: "  << in_file << endl;  return 0; }
+	if(!infile) {
+             
+ hout << "Failed to open input file: "  << in_file << endl;  return 0;
+		      
+                     }
 
 	//Read output file name into out_file
 	string out_file;
@@ -45,14 +52,18 @@ int main(int argc, char** argv)
 	else
 	{
 		cout << "The output file name is:  ";
+		     
 		out_file = "output.dat";
+          
 		cout << out_file << endl;
+		      
 	};
 	//Open the output stream
 	if(out_file.size()>0) open_deffo_stream( (char*)out_file.c_str() );
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Identification Tag
+
 	cout<<endl;
 	cout<<"*************************************************"<<endl;
 	cout<<"*                  NECA   v3.0                  *"<<endl;
@@ -76,7 +87,7 @@ int main(int argc, char** argv)
 	hout<<"*************************************************"<<endl;
 	hout<<endl;
 	hout<<endl;
-
+	  
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Call for application cases
@@ -87,6 +98,7 @@ int main(int argc, char** argv)
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Input reader
+
 	hout<<"======================================================" << endl;
 	hout<<"-_- Input file reader......"<<endl;
 	cout<<endl;
@@ -94,6 +106,7 @@ int main(int argc, char** argv)
 	cout<<"|                Data input                     |"<<endl;
 	cout<<"-------------------------------------------------"<<endl;
 	cout<<endl;
+	  
 	Input *Init = new Input;
 	if(Init->Data_Initialization())
 	{ 
@@ -101,11 +114,12 @@ int main(int argc, char** argv)
 	}
 	else return 0;
 	it_end= time(NULL);
+
 	hout<<"    Operation done in "<<(int)(it_end-it_begin)<<"secs."<<endl;
 	hout<<"^_^ Input achieves"<<endl<<endl;
 	cout<<"^_^ Input achieves"<<endl<<endl;
 	cout<<"Operation done in"<<(int)(it_end-it_begin)<<"secs."<<endl;//王增加的句子
-
+	  
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Implementation
 	if(Init->app_name.str=="App_Fracture")
@@ -136,6 +150,7 @@ int main(int argc, char** argv)
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Time markers for total simulation
 	it_end = time(NULL);
+
 	cout<<endl;
 	cout<<"*******************************************************************"<<endl;
 	cout<<"    The simulation took "<<(int)(it_end-it_begin)<<"secs."<<endl;
@@ -146,7 +161,7 @@ int main(int argc, char** argv)
 	hout<<"    The simulation took "<<(int)(it_end-it_begin)<<"secs."<<endl;
 	hout<<"^_^ End of simulation "<<endl;
 	hout<<"*******************************************************************"<<endl;
-
+	  
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//End comments
@@ -174,7 +189,7 @@ int main(int argc, char** argv)
 	hout<<"*************************************************"<<endl;
 	hout<<endl;
 	hout<<endl;
-
+	  
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//Close the output stream
 	close_deffo_stream();

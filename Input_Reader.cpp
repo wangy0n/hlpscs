@@ -5,17 +5,20 @@
 //AUTHOR:		Fei Han; Yan Azdoud
 //E-MAIL:			fei.han@kaust.edu.sa;  yan.azdoud@kaust.edu.sa
 //====================================================================================
-
+extern int myid;
+extern int group_size;
+#include"mpi.h"
 #include "Input_Reader.h"
 
 //---------------------------------------------------------------------------
 //Read data
 int Input::Read_Infile(ifstream &infile)
 {
-
+  if (myid==0)
+    {
 	cout << "Reading input file..." << endl;
 	hout << "Reading input file..." << endl;
-
+    }
 	while(!infile.eof())
 	{
 		istringstream istr(Get_Line(infile));
@@ -56,10 +59,11 @@ int Input::Read_Infile(ifstream &infile)
 		}
 
 	}
-
+	if(myid==0)
+	  {
 	cout << "Reading the keywords is finished!" << endl;
 	hout << "Reading the keywords is finished!" << endl;
-
+	  }
 	if(!app_name.mark) { cout << "Attention: \"Application_Name\" will use default parameters!" << endl; hout << "Attention: \"Application_Name\" will use default parameters!" << endl; }
 	if(!simu_name.mark) {	cout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; hout << "Attention: \"Simulation_Name\" will use default parameters!" << endl; }
 	if(!stif_loc.mark)	{ cout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; hout << "Attention: \"Local_Stiffness\" will use default parameters!" << endl; }
@@ -256,9 +260,11 @@ int Input::Read_application_name(struct App_name &app_name, ifstream &infile)
 int Input::Read_simulation_name(struct Simu_name &simu_name, ifstream &infile)
 {
 	if(simu_name.mark)
-	{
+	  {if(myid==0)
+	      {
 		cout << "Attention: \"" << simu_name.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << simu_name.keywords << "\" has been input!" << endl;
+	      }
 		return 0;
 	}
 	else simu_name.mark = true;
@@ -273,9 +279,11 @@ int Input::Read_simulation_name(struct Simu_name &simu_name, ifstream &infile)
 int Input::Read_local_stiffness(struct Stif_loc &stif_loc, ifstream &infile)
 {
 	if(stif_loc.mark)
-	{
+	  {if(myid==0)
+	      {
 		cout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;
+	      }
 		return 0;
 	}
 	else stif_loc.mark = true;
@@ -339,9 +347,11 @@ int Input::Read_local_stiffness(struct Stif_loc &stif_loc, ifstream &infile)
 			stif_loc.G13.push_back(G13);
 		}
 		else
-		{
+		  {if(myid==0)
+		      {
 			hout << "Error: the material type of local model " << type_temp << " is not defined!" << endl;
 			cout << "Error: the material type of local model " << type_temp << " is not defined!" << endl;
+		      }
 			return 0;
 		}
 	}
@@ -353,9 +363,11 @@ int Input::Read_local_stiffness(struct Stif_loc &stif_loc, ifstream &infile)
 int Input::Read_local_stiffness_2D(struct Stif_loc &stif_loc, ifstream &infile)
 {
 	if(stif_loc.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << stif_loc.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else stif_loc.mark = true;
@@ -402,9 +414,11 @@ int Input::Read_local_stiffness_2D(struct Stif_loc &stif_loc, ifstream &infile)
 			stif_loc.G13.push_back(1.0E+30);
 		}
 		else
-		{
+		{if(myid==0)
+		      {
 			hout << "Error: the material type of local model " << type_temp << " is not defined!" << endl;
 			cout << "Error: the material type of local model " << type_temp << " is not defined!" << endl;
+		      }
 			return 0;
 		}
 	}
@@ -416,9 +430,11 @@ int Input::Read_local_stiffness_2D(struct Stif_loc &stif_loc, ifstream &infile)
 int Input::Read_nonlocal_stiffness(struct Stif_nonloc &stif_nonloc, ifstream &infile)
 {
 	if(stif_nonloc.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << stif_nonloc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << stif_nonloc.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else stif_nonloc.mark = true;
@@ -450,9 +466,11 @@ int Input::Read_nonlocal_stiffness(struct Stif_nonloc &stif_nonloc, ifstream &in
 		istr >> E11 >> E22 >> E33 >> Nu12 >> Nu23 >> Nu13;
 	}
 	else
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the material type of nonlocal model " << stif_nonloc.type << " is not defined!" << endl;
 		hout << "Error: the material type of nonlocal model " << stif_nonloc.type << " is not defined!" << endl;
+		      }
 		return 0;
 	}
 
@@ -473,9 +491,11 @@ int Input::Read_nonlocal_stiffness(struct Stif_nonloc &stif_nonloc, ifstream &in
 int Input::Read_nonlocal_stiffness_2D(struct Stif_nonloc &stif_nonloc, ifstream &infile)
 {
 	if(stif_nonloc.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << stif_nonloc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << stif_nonloc.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else stif_nonloc.mark = true;
@@ -497,9 +517,11 @@ int Input::Read_nonlocal_stiffness_2D(struct Stif_nonloc &stif_nonloc, ifstream 
 		istr >> E11 >> E22 >> Nu12;
 	}
 	else
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the material type of nonlocal model " << stif_nonloc.type << " is not defined!" << endl;
 		hout << "Error: the material type of nonlocal model " << stif_nonloc.type << " is not defined!" << endl;
+		      }
 		return 0;
 	}
 
@@ -520,9 +542,11 @@ int Input::Read_nonlocal_stiffness_2D(struct Stif_nonloc &stif_nonloc, ifstream 
 int Input::Read_peridynamic_parameters(struct Peri_para &peri_para, ifstream &infile)
 {
 	if(peri_para.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << peri_para.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << peri_para.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else peri_para.mark = true;
@@ -530,9 +554,11 @@ int Input::Read_peridynamic_parameters(struct Peri_para &peri_para, ifstream &in
 	istringstream istr(Get_Line(infile));
 	istr >> peri_para.horizon_R >> peri_para.intrinsic_L  >> peri_para.broken_factor;
 	if(peri_para.horizon_R<0||peri_para.intrinsic_L<=0||peri_para.broken_factor<=1.0) 
-	{ 
+	{ if(myid==0)
+		      {
 		cout <<"Error: selected parameter in \"Peridynamic_Parameters\" is wrong!" << endl; 
 		hout <<"Error: selected parameter in \"Peridynamic_Parameters\" is wrong!" << endl; 
+		      }
 		return 0; 
 	}	
 
@@ -543,9 +569,11 @@ int Input::Read_peridynamic_parameters(struct Peri_para &peri_para, ifstream &in
 int Input::Read_rve_geometry(struct Geom_RVE &geom_rve, ifstream &infile)
 {
 	if(geom_rve.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << geom_rve.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << geom_rve.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else geom_rve.mark = true;
@@ -554,9 +582,11 @@ int Input::Read_rve_geometry(struct Geom_RVE &geom_rve, ifstream &infile)
 	istr >> geom_rve.origin.x >> geom_rve.origin.y >> geom_rve.origin.z;
 	istr >> geom_rve.len_x >> geom_rve.wid_y >> geom_rve.hei_z;
 	if(geom_rve.len_x<0||geom_rve.wid_y<0||geom_rve.hei_z<0)
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the sizes of RVE should be positive!" << endl;
 		hout << "Error: the sizes of RVE should be positive!" << endl;
+		      }
 		return 0;
 	} 	
 
@@ -567,9 +597,11 @@ int Input::Read_rve_geometry(struct Geom_RVE &geom_rve, ifstream &infile)
 int Input::Read_grid_size(struct Grid_size &grid_size, ifstream &infile)
 {
 	if(grid_size.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << grid_size.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << grid_size.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else grid_size.mark = true;
@@ -577,9 +609,11 @@ int Input::Read_grid_size(struct Grid_size &grid_size, ifstream &infile)
 	istringstream istr(Get_Line(infile));
 	istr >> grid_size.delta_x >> grid_size.delta_y >> grid_size.delta_z;
 	if(grid_size.delta_x<0||grid_size.delta_y<0||grid_size.delta_z<0)
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: size of grid in \"" << grid_size.keywords << "\" is less than 0!" << endl;
 		hout << "Error: size of grid in \"" << grid_size.keywords << "\" is less than 0!" << endl;
+		      }
 		return 0;
 	}
 
@@ -590,9 +624,11 @@ int Input::Read_grid_size(struct Grid_size &grid_size, ifstream &infile)
 int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infile)
 {
 	if(weight_func.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << weight_func.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << weight_func.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else weight_func.mark = true;
@@ -618,9 +654,11 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 			weight_func.r1.push_back(r1);
 			weight_func.ratio.push_back(1.0);		//fullfilled data
 			if(r0>r1) 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the inner radius is larger than the outer radius of homocentric sphere!" << endl;
 				hout << "Error: the inner radius is larger than the outer radius of homocentric sphere!" << endl;
+		      }
 				return 0; 
 			}
 		}
@@ -638,15 +676,19 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 			weight_func.r1.push_back(r1);
 			weight_func.ratio.push_back(ratio);
 			if(r0>r1) 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the inner radius is larger than the outer radius of homocentric ellipse in the cross section!" << endl;
 				hout << "Error: the inner radius is larger than the outer radius of homocentric ellipse in the cross section!" << endl;
+		      }
 				return 0;
 			}
 			if(ratio<=0) 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the ratio of axes in ellipse of the cylinder section is under 0!" << endl;
 				hout << "Error: the ratio of axes in ellipse of the cylinder section is under 0!" << endl;
+		      }
 				return 0; 
 			}
 		}
@@ -659,9 +701,11 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 			weight_func.ratio.push_back(1.0);
 		}
 		else
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: the shape of weighting area " << str_temp << " is not defined!" << endl;
 			hout << "Error: the shape of weighting area " << str_temp << " is not defined!" << endl;
+		      }
 			return 0;
 		}
 		
@@ -675,9 +719,11 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 			istr >> val_temp;
 			weight_func.func_constant.push_back(val_temp);
 			if(val_temp>1.0||val_temp<0.0) 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the specified value of constant weighting function is not between 0 and 1!" << endl;
 				hout << "Error: the specified value of constant weighting function is not between 0 and 1!" << endl;
+		      }
 				return 0;
 			}
 		}
@@ -686,9 +732,11 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 			weight_func.func_constant.push_back(0.0);    //keep a correspondence between  "func_order" and "func_constant".
 		}
 		else
-		{ 
+		{ if(myid==0)
+		      {
 			cout << "Error, the weighting function order " << str_func << " is not yet defined!" << endl; 
 			hout << "Error, the weighting function order " << str_func << " is not yet defined!" << endl; 
+		      }
 			return 0; 
 		}
 	}
@@ -700,9 +748,11 @@ int Input::Read_weight_function(struct Weight_func &weight_func, ifstream &infil
 int Input::Read_element_properties(struct Ele_prop &ele_prop, ifstream &infile)
 {
 	if(ele_prop.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << ele_prop.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << ele_prop.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else ele_prop.mark = true;
@@ -714,9 +764,11 @@ int Input::Read_element_properties(struct Ele_prop &ele_prop, ifstream &infile)
 	{
 		istr >> ele_prop.radius;
 		if(ele_prop.radius<0.0) 
-		{ 
+		{ if(myid==0)
+		      {
 			cout <<"Error: the radius of fiber is less than 0!" << endl;	
-			hout <<"Error: the radius of fiber is less than 0!" << endl;	
+			hout <<"Error: the radius of fiber is less than 0!" << endl;
+		      }	
 			return 0; 
 		}
 	}
@@ -726,16 +778,20 @@ int Input::Read_element_properties(struct Ele_prop &ele_prop, ifstream &infile)
 		if(ele_prop.zone_xmin>ele_prop.zone_xmax||
 			ele_prop.zone_ymin>ele_prop.zone_ymax||
 			ele_prop.zone_zmin>ele_prop.zone_zmax)
-		{ 
+		{ if(myid==0)
+		      {
 			cout <<"Error: the parameters of zone in \" Element Material Properties\" are defined incorrectly!" << endl;	
-			hout <<"Error: the parameters of zone in \" Element Material Properties\" are defined incorrectly!" << endl;	
+			hout <<"Error: the parameters of zone in \" Element Material Properties\" are defined incorrectly!" << endl;
+		      }	
 			return 0; 
 		}
 	}
 	else if(ele_prop.type!="Pure")
-	{
+	{if(myid==0)
+		      {
 		cout << "The type of element material properties is defined incorrectly!" << endl; 
 		hout << "The type of element material properties is defined incorrectly!" << endl; 
+		      }
 		return 0;
 	}
 
@@ -746,9 +802,11 @@ int Input::Read_element_properties(struct Ele_prop &ele_prop, ifstream &infile)
 int Input::Read_crack(struct Crack &cracks, ifstream &infile)
 {
 	if(cracks.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << cracks.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << cracks.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else cracks.mark = true;
@@ -764,44 +822,54 @@ int Input::Read_crack(struct Crack &cracks, ifstream &infile)
 		istringstream istr0(Get_Line(infile));
 		istr0 >> n0 >> ch0;
 		if(n0!=0||(ch0!='x'&&ch0!='y'&&ch0!='z'))
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: The parameter in the line 0 of  the crack " << i << " is defined incorrectly!" << endl;
 			hout << "Error: The parameter in the line 0 of  the crack " << i << " is defined incorrectly!" << endl;
+		      }
 			return 0;
 		}
 
 		istringstream istr1(Get_Line(infile));
 		istr1 >> n1 >> ch1 >> d10;
 		if(n1!=1||(ch1!='x'&&ch1!='y'&&ch1!='z'))
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: The parameter in the line 1 of  the crack " << i << " is defined incorrectly!" << endl;
 			hout << "Error: The parameter in the line 1 of  the crack " << i << " is defined incorrectly!" << endl;
+		      }
 			return 0;
 		}
 
 		istringstream istr2(Get_Line(infile));
 		istr2 >> n2 >> ch2 >> d20 >> d21;
 		if(n2!=2||(ch2!='x'&&ch2!='y'&&ch2!='z')||d20>=d21)
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: The parameter in the line 2 of  the crack " << i << " is defined incorrectly!" << endl;
 			hout << "Error: The parameter in the line 2 of  the crack " << i << " is defined incorrectly!" << endl;
+		      }
 			return 0;
 		}
 		if((ch0!='x'&&ch1!='x'&&ch2!='x')||
 			(ch0!='y'&&ch1!='y'&&ch2!='y')||
 			(ch0!='z'&&ch1!='z'&&ch2!='z')) 
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: 'x', 'y' or 'z' is repeated in crack representation!" << endl;
 			hout << "Error: 'x', 'y' or 'z' is repeated in crack representation!" << endl;
+		      }
 			return 0;
 		}
 
 		istringstream istr3(Get_Line(infile));
 		istr3 >> n3 >> d30 >> d31;
 		if(n3!=3||d30<0||d30>1||d31<0||d31>2)		
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: The parameter in the line 3 of  the crack " << i << " is defined incorrectly!" << endl;
 			hout << "Error: The parameter in the line 3 of  the crack " << i << " is defined incorrectly!" << endl;
+		      }
 			return 0;
 		}
 
@@ -817,9 +885,11 @@ int Input::Read_crack(struct Crack &cracks, ifstream &infile)
 int Input::Read_damage(struct Damage &damages, ifstream &infile)
 {
 	if(damages.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << damages.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << damages.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else damages.mark = true;
@@ -828,15 +898,19 @@ int Input::Read_damage(struct Damage &damages, ifstream &infile)
 	istr >> damages.d_crit >> damages.k1 >> damages.k0;
 
 	if(damages.d_crit<0||damages.d_crit>1.0)
-	{
+	{if(myid==0)
+		      {
 		cout << "The critical parameter in the item \"Damage\" is defined incorrectly!" << endl; 
 		hout << "The critical parameter in the item \"Damage\" is defined incorrectly!" << endl; 
+		      }
 		return 0;
 	}
 	if(fabs(damages.k1)<=Zero)
-	{
+	{if(myid==0)
+		      {
 		cout << "The coefficient of Pseudo potential in the item \"Damage\" equals to zero!" << endl; 
 		hout << "The coefficient of Pseudo potential in the item \"Damage\" equals to zero!" << endl; 
+		      }
 		return 0;
 	}
 
@@ -847,9 +921,11 @@ int Input::Read_damage(struct Damage &damages, ifstream &infile)
 int Input::Read_model_discret(struct Model_Discret &mod_disc, ifstream &infile)
 {
 	if(mod_disc.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << mod_disc.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << mod_disc.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else mod_disc.mark = true;
@@ -857,15 +933,19 @@ int Input::Read_model_discret(struct Model_Discret &mod_disc, ifstream &infile)
 	istringstream istr(Get_Line(infile));
 	istr >> mod_disc.mod >> mod_disc.disc;
 	if(mod_disc.mod!="Local"&&mod_disc.mod!="Nonlocal"&&mod_disc.mod!="Hybrid")
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the type of model \"" << mod_disc.mod << "\" is not yet defined!" << endl;
 		hout << "Error: the type of model \"" << mod_disc.mod << "\" is not yet defined!" << endl;
+		      }
 		return 0;
 	}
 	if(mod_disc.disc!="FEM"&&mod_disc.disc!="DGFEM")
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the type of discretization \"" << mod_disc.disc << "\" is not yet defined!" << endl;
 		hout << "Error: the type of discretization \"" << mod_disc.disc << "\" is not yet defined!" << endl;
+		      }
 		return 0;
 	}
 
@@ -876,9 +956,11 @@ int Input::Read_model_discret(struct Model_Discret &mod_disc, ifstream &infile)
 int Input::Read_iterative(struct Iterative &iter, ifstream &infile)
 {
 	if(iter.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << iter.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << iter.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else iter.mark = true;
@@ -887,9 +969,11 @@ int Input::Read_iterative(struct Iterative &iter, ifstream &infile)
 	istr >> iter.type;
 
 	if(iter.type!=0&&iter.type!=1)
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: " << iter.type << "=" << iter.type << " is not 0 or 1!" << endl;
 		hout << "Error: " << iter.type << "=" << iter.type << " is not 0 or 1!" << endl;
+		      }
 		return 0;
 	}
 
@@ -898,9 +982,11 @@ int Input::Read_iterative(struct Iterative &iter, ifstream &infile)
 		istr >> iter.max_iter >> iter.ramp_para;
 
 		if(iter.max_iter<=0||iter.ramp_para<=0)
-		{
+		{if(myid==0)
+		      {
 			cout << "The parameter in the item \"Iterative\" is defined incorrectly!" << endl; 
 			hout << "The parameter in the item \"Iterative\" is defined incorrectly!" << endl; 
+		      }
 			return 0; 
 		}
 	}
@@ -912,9 +998,11 @@ int Input::Read_iterative(struct Iterative &iter, ifstream &infile)
 int Input::Read_rw_mod(struct RW_mod &rw_mod, ifstream &infile)
 {
 	if(rw_mod.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << rw_mod.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << rw_mod.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else rw_mod.mark = true;
@@ -929,9 +1017,11 @@ int Input::Read_rw_mod(struct RW_mod &rw_mod, ifstream &infile)
 int Input::Read_gauss(struct Gauss_Point &gauss, ifstream &infile)
 {
 	if(gauss.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << gauss.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << gauss.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else gauss.mark = true;
@@ -939,9 +1029,11 @@ int Input::Read_gauss(struct Gauss_Point &gauss, ifstream &infile)
 	istringstream istr(Get_Line(infile));
 	istr >> gauss.num;
 	if(gauss.num<=0||gauss.num>=100)
-	{
+	{if(myid==0)
+		      {
 		cout <<"Error: the number of gauss point in 1D is " << gauss.num << "!" << endl; 
 		hout <<"Error: the number of gauss point in 1D is " << gauss.num << "!" << endl; 
+		      }
 		return 0; 
 	}
 
@@ -952,9 +1044,11 @@ int Input::Read_gauss(struct Gauss_Point &gauss, ifstream &infile)
 int Input::Read_load(struct Load &load, ifstream &infile)
 {
 	if(load.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << load.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << load.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else load.mark = true;
@@ -974,9 +1068,11 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 		else if(domain_type=="Surface")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else if(domain_type=="Zone")	{ coef.resize(6); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3] >> coef[4] >> coef[5]; }
 		else
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: selected type for loaded area is not defined!" << endl; 
 			hout << "Error: selected type for loaded area is not defined!" << endl;
+		      }
 			return 0; 
 		}
 
@@ -995,9 +1091,11 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 			if(str_temp=="Force_x")
 			{
 				if(sign>=1) 
-				{
+				{if(myid==0)
+		      {
 					cout << "Error: the force type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the force type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0;
 				}
 				sign += 1;
@@ -1005,9 +1103,11 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 			else if(str_temp=="Force_y")
 			{
 				if(sign>=2) 
-				{
+				{if(myid==0)
+		      {
 					cout << "Error: the force type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the force type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0;
 				}
 				sign += 2;
@@ -1015,17 +1115,21 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 			else if(str_temp=="Force_z")
 			{
 				if(sign>=4) 
-				{
+				{if(myid==0)
+		      {
 					cout << "Error: the force type is repeated or in a wrong order!" << endl;
 					hout << "Error: the force type is repeated or in a wrong order!" << endl;
+		      }
 					return 0; 
 				}
 				sign += 4;
 			}
 			else 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the force type is not defined!" << endl;
 				hout << "Error: the force type is not defined!" << endl;
+		      }
 				return 0; 
 			}
 
@@ -1034,9 +1138,11 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 			value.push_back(val_temp);
 		}
 		if((int)value.size()==0||(int)value.size()>3||(int)value.size()!=(int)load_type.size())
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: force conditions are not input or excessive!" << endl; 
 			hout << "Error: force conditions are not input or excessive!" << endl; 
+		      }
 			return 0;
 		}
 
@@ -1051,9 +1157,11 @@ int Input::Read_load(struct Load &load, ifstream &infile)
 int Input::Read_load_2D(struct Load &load, ifstream &infile)
 {
 	if(load.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << load.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << load.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else load.mark = true;
@@ -1073,9 +1181,11 @@ int Input::Read_load_2D(struct Load &load, ifstream &infile)
 		else if(domain_type=="Line")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else if(domain_type=="Zone")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: selected type for loaded area is not defined!" << endl; 
 			hout << "Error: selected type for loaded area is not defined!" << endl;
+		      }
 			return 0; 
 		}
 
@@ -1094,9 +1204,11 @@ int Input::Read_load_2D(struct Load &load, ifstream &infile)
 			if(str_temp=="Force_x")
 			{
 				if(sign>=1) 
-				{
+				{if(myid==0)
+		      {
 					cout << "Error: the force type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the force type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0;
 				}
 				sign += 1;
@@ -1104,17 +1216,21 @@ int Input::Read_load_2D(struct Load &load, ifstream &infile)
 			else if(str_temp=="Force_y")
 			{
 				if(sign>=2) 
-				{
+				{if(myid==0)
+		      {
 					cout << "Error: the force type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the force type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0;
 				}
 				sign += 2;
 			}
 			else 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: the force type is not defined!" << endl;
 				hout << "Error: the force type is not defined!" << endl;
+		      }
 				return 0; 
 			}
 
@@ -1123,9 +1239,11 @@ int Input::Read_load_2D(struct Load &load, ifstream &infile)
 			value.push_back(val_temp);
 		}
 		if((int)value.size()==0||(int)value.size()>2||(int)value.size()!=(int)load_type.size())
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: force conditions are not input or excessive!" << endl; 
 			hout << "Error: force conditions are not input or excessive!" << endl; 
+		      }
 			return 0;
 		}
 
@@ -1140,9 +1258,11 @@ int Input::Read_load_2D(struct Load &load, ifstream &infile)
 int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 {
 	if(displace.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << displace.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << displace.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else displace.mark = true;
@@ -1162,9 +1282,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 		else if(domain_type=="Surface")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else if(domain_type=="Zone")	{ coef.resize(6); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3] >> coef[4] >> coef[5]; }
 		else if(domain_type!="All_surfaces")
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: selected type for displacement area is not defined!" << endl; 
 			hout << "Error: selected type for displacement area is not defined!" << endl;
+		      }
 			return 0; 
 		}
 
@@ -1183,9 +1305,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 			if(str_temp=="Fixed_displacement_x")
 			{
 				if(sign>=1) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: the displacement type is repeated or in a wrong order!" << endl;
 					hout << "Error: the displacement type is repeated or in a wrong order!" << endl;
+		      }
 					return 0; 
 				}
 				sign += 1;
@@ -1193,9 +1317,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 			else if(str_temp=="Fixed_displacement_y")
 			{
 				if(sign>=2) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0; 
 				}
 				sign += 2;
@@ -1203,9 +1329,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 			else if(str_temp=="Fixed_displacement_z")
 			{
 				if(sign>=4) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
-					hout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
+					hout << "Error: the displacement type is repeated or in a wrong order!" << endl;
+		      } 
 					return 0; 
 				}
 				sign += 4;
@@ -1213,16 +1341,20 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 			else if(str_temp=="Pure_shear") 
 			{
 				if(sign>0) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: \"Pure_shear\" is not the only displacement condition!" << endl; 
-					hout << "Error: \"Pure_shear\" is not the only displacement condition!" << endl; 
+					hout << "Error: \"Pure_shear\" is not the only displacement condition!" << endl;
+		      } 
 					return 0; 
 				}
 			}
 			else 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: selected type for displacement condition is not defined!" << endl; 
 				hout << "Error: selected type for displacement condition is not defined!" << endl; 
+		      }
 				return 0; 
 			}
 
@@ -1231,9 +1363,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 			value.push_back(val_temp);
 		}
 		if((int)value.size()==0||(int)value.size()>3||(int)value.size()!=(int)disp_type.size())
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: force conditions are not input or excessive!" << endl; 
-			hout << "Error: force conditions are not input or excessive!" << endl; 
+			hout << "Error: force conditions are not input or excessive!" << endl;
+		      } 
 			return 0;
 		}
 
@@ -1248,9 +1382,11 @@ int Input::Read_displacement(struct Displace &displace, ifstream &infile)
 int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 {
 	if(displace.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << displace.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << displace.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else displace.mark = true;
@@ -1270,9 +1406,11 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 		else if(domain_type=="Line")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else if(domain_type=="Zone")	{ coef.resize(4); istr >> coef[0] >> coef[1] >> coef[2] >> coef[3]; }
 		else if(domain_type!="All_boundaries")
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: selected type for displacement area is not defined!" << endl; 
 			hout << "Error: selected type for displacement area is not defined!" << endl;
+		      }
 			return 0; 
 		}
 
@@ -1291,9 +1429,11 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 			if(str_temp=="Fixed_displacement_x")
 			{
 				if(sign>=1) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: the displacement type is repeated or in a wrong order!" << endl;
 					hout << "Error: the displacement type is repeated or in a wrong order!" << endl;
+		      }
 					return 0; 
 				}
 				sign += 1;
@@ -1301,9 +1441,11 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 			else if(str_temp=="Fixed_displacement_y")
 			{
 				if(sign>=2) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
 					hout << "Error: the displacement type is repeated or in a wrong order!" << endl; 
+		      }
 					return 0; 
 				}
 				sign += 2;
@@ -1311,16 +1453,20 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 			else if(str_temp=="Pure_shear") 
 			{
 				if(sign>0) 
-				{ 
+				{ if(myid==0)
+		      {
 					cout << "Error: \"Pure_shear\" is not the only displacement condition!" << endl; 
 					hout << "Error: \"Pure_shear\" is not the only displacement condition!" << endl; 
+		      }
 					return 0; 
 				}
 			}
 			else 
-			{
+			{if(myid==0)
+		      {
 				cout << "Error: selected type for displacement condition is not defined!" << endl; 
 				hout << "Error: selected type for displacement condition is not defined!" << endl; 
+		      }
 				return 0; 
 			}
 
@@ -1329,9 +1475,11 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 			value.push_back(val_temp);
 		}
 		if((int)value.size()==0||(int)value.size()>2||(int)value.size()!=(int)disp_type.size())
-		{
+		{if(myid==0)
+		      {
 			cout << "Error: force conditions are not input or excessive!" << endl; 
 			hout << "Error: force conditions are not input or excessive!" << endl; 
+		      }
 			return 0;
 		}
 
@@ -1346,9 +1494,11 @@ int Input::Read_displacement_2D(struct Displace &displace, ifstream &infile)
 int Input::Read_force_disp_TPB_2D(struct Force_Disp_TPB &force_disp, const struct Geom_RVE &geom_rve, const int &iter_num, ifstream &infile)
 {
 	if(force_disp.mark)
-	{
+	{if(myid==0)
+		      {
 		cout << "Attention: \"" << force_disp.keywords << "\" has been input!" << endl;
 		hout << "Attention: \"" << force_disp.keywords << "\" has been input!" << endl;
+		      }
 		return 0;
 	}
 	else force_disp.mark = true;
@@ -1361,15 +1511,19 @@ int Input::Read_force_disp_TPB_2D(struct Force_Disp_TPB &force_disp, const struc
 		force_disp.cx1>geom_rve.origin.x+geom_rve.len_x||
 		force_disp.cy0<geom_rve.origin.y||
 		force_disp.cy0>geom_rve.origin.y+geom_rve.wid_y)
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the position parameters for force displacement plot of three point bending are not right!" << endl; 
 		hout << "Error: the position parameters for force displacement plot of three point bending are not right!" << endl; 
+		      }
 		return 0;
 	}
 	if(total_displacement<0) 
-	{
+	{if(myid==0)
+		      {
 		cout << "Error: the total displacement for force displacement plot of three point bending is less than 0!(Here an absolute value is needed!)" << endl; 
 		hout << "Error: the total displacement for force displacement plot of three point bending are not right!(Here an absolute value is needed!)" << endl; 
+		      }
 		return 0;
 	}
 
