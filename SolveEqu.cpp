@@ -373,6 +373,9 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 	if(bnod_num!=0) displacement_nonzero_value(1,1,bnod_num,ip,vp,X,V);  //处理位移非零值约束条件
 
 	//---------------------------------------------------------------------
+        
+
+
 	mabvm(N,N1,Iz,Ig,A,X,V);		//CALCULATE PRODUCT A*X0=> AP  
 
 	//----------------------------parallel computing-----------------------------------------
@@ -381,12 +384,15 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 		R[i]=B[i]-V[i];
 		P[i]=R[i];
 	}
-	for(int i=0;i<N1;i++)
-	  {
-	    MPI_Bcast(&P[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
-          MPI_Bcast(&R[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
-	  }
+	
 	MPI_Barrier(MPI_COMM_WORLD);
+
+        for(int i=0;i<N1;i++)
+	{
+	  MPI_Bcast(&P[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
+	  MPI_Bcast(&R[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
+        }
+
 	//---------------------------------------------------------------------
 	if(bnod_num!= 0) displacement_nonzero_value(0,1,bnod_num,ip,vp,P,R);		//处理位移非零值约束条件
 
@@ -397,9 +403,9 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 	{
 		MPI_RR0=MPI_RR0+R[i]*R[i];
 	}
-	//	MPI_Barrier(MPI_COMM_WORLD);
-	MPI_Reduce(&MPI_RR0,&RR0,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-	MPI_Bcast(&RR0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	//MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Allreduce(&MPI_RR0,&RR0,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+	//MPI_Bcast(&RR0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	R0=sqrt(RR0);
 	//--------------------------------------------------------------------- 
 	//ENTER TO ITERATE                                                
@@ -685,22 +691,26 @@ V[i]=0.0;		//赋初值
 	}
 
 	//parallel computing codes
-	//MPI_Barrier(MPI_COMM_WORLD);
-	for (int i=0;i<3*N;i++)
+	MPI_Barrier(MPI_COMM_WORLD);
+	//for (int i=0;i<3*N;i++)
 	  // { for(int j=0;j<=2;j++)
-	    {
+	//{
 	     
-	 MPI_Reduce(&VV[i],&V[i],1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	      MPI_Reduce(&VV[0],&V[0],3*N,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 
 	      // }
-	  }
-	for (int i=0;i<3*N;i++)
+	// }
+	//MPI_Barrier(MPI_COMM_WORLD);
+
+	//MPI_Bcast(&V,3*N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	//for (int i=0;i<3*N;i++)
 	  // { for(int j=0;j<=2;j++)
-	    {
+	      //{
 	        
-	       MPI_Bcast(&V[i],1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-	       // }
-	  }
+	  MPI_Bcast(&V[0],3*N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	  // }
+	  //}
+	//MPI_Barrier(MPI_COMM_WORLD);
 	//to test the result of parallel computing
 	// cout<<"N:"<<N<<endl;
 	//	  if( myid==0)
