@@ -454,25 +454,47 @@ if(myid==0)//The 5th if(myid==0).
 
 				Solv.Deal_with_displacement_zero_value(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, equright, total_matrix);
 			        total_matrix_num=(int)total_matrix.size();
+				cout<<"solv.deal_with_displacement_zero_value"<<endl;
+                                hout<<"solv.deal_with_displacement_zero_value"<<endl;
 
  }//The end of the 5th if(myid==0).
                          
 				   U_Solution.assign(3*nodes_num, 0.0);
+				cout<<"U_Solution.assign"<<endl;
+                                hout<<"U_Solution.assign"<<endl;
+
                                    MPI_Bcast(&total_matrix_num,1,MPI_INT,0,MPI_COMM_WORLD);
+				cout<<"MPI_Bcast total_matrix_num"<<endl;
+                                hout<<"MPI_Bcast total_matrix_num"<<endl;
+
 
 	  if(myid!=0)//The 2nd if(myid!=0).
 	 {
-                                  total_matrix.assign(total_matrix_num,0.0);
+                                 total_matrix.assign(total_matrix_num,0.0);
+				cout<<"total_matrix.assign"<<endl;
+                                hout<<"total_matrix.assign"<<endl;
+
 	 }//The end of the 2nd if(myid!=0).
 
 	       		          MPI_Barrier(MPI_COMM_WORLD);
+				cout<<"MPI_Barrier"<<endl;
+                                hout<<"MPI_Barrier"<<endl;
+
 
 			          MPI_Bcast(&total_matrix[0],total_matrix_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
+				cout<<"MPI_Bcast total_matrix"<<endl;
+                                hout<<"MPI_Bcast total_matrix"<<endl;
+
 			          MPI_Bcast(&U_Solution[0],3*nodes_num,MPI_DOUBLE,0,MPI_COMM_WORLD);
+				cout<<"MPI_Bcast U_Solution"<<endl;
+                                hout<<"MPI_Bcast U_Solution"<<endl;
+
 				
                  	          MPI_Barrier(MPI_COMM_WORLD);
 
-                                 Solv.Solve_linear_equations(bnod_num, nodes_num, Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
+				  cout<<"before the solv_linear_equations"<<endl;
+                                  hout<<"before the solv_linear_equations"<<endl;
+                                  Solv.Solve_linear_equations(bnod_num, nodes_num, Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
 
 				//Solv.Solve_linear_equations(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, total_matrix, equright, U_Solution);
 				//Solv.Solve_linear_equations_omp(bnod_num, (int)Mesh.nodes.size(), Iz, Ig, ip, vp, total_matrix, equright, U_Solution);

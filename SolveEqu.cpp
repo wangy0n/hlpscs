@@ -11,6 +11,7 @@ extern int group_size;
 #include "SolveEqu.h"
 //---------------------------------------------------------------------------
 //紧缩存储刚度矩阵
+//modify these codes on 21:36 10-Jun-2016
 int SolveEqu::izig(const vector<Node> &nodes, vector<int> &Iz, vector<int> &Ig)const
 {
 	
@@ -378,25 +379,38 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 
 	mabvm(N,N1,Iz,Ig,A,X,V);		//CALCULATE PRODUCT A*X0=> AP  
 
-	//----------------------------parallel computing-----------------------------------------
-	for(int i=myid; i<N1; i+=group_size)		//CALCULATE R0=P0=B-A*X0
+	//---------------------------------------------------------------------
+	for(int i=0; i<N1; i++)		//CALCULATE R0=P0=B-A*X0
 	{
 		R[i]=B[i]-V[i];
 		P[i]=R[i];
 	}
-	
-	MPI_Barrier(MPI_COMM_WORLD);
+             
+	//----------------------------parallel computing  1-----------------------------------------
 
-        for(int i=0;i<N1;i++)
-	{
-	  MPI_Bcast(&P[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
-	  MPI_Bcast(&R[i],1,MPI_DOUBLE,i%group_size,MPI_COMM_WORLD);
-        }
+	//vector<double> PP(3*N, 0);
+	//vector<double> RR(3*N, 0);
+
+
+	//for(int i=myid; i<N1; i+=group_size)		//CALCULATE R0=P0=B-A*X0
+	//{
+		//RR[i]=B[i]-V[i];
+		//PP[i]=RR[i];
+	//}
+	
+	//MPI_Barrier(MPI_COMM_WORLD);
+          // MPI_Reduce(&PP[0],&P[0],3*N,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+          // MPI_Reduce(&RR[0],&R[0],3*N,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	      // MPI_Bcast(&P[0],3*N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	     //  MPI_Bcast(&R[0],3*N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+        
+
+            
 
 	//---------------------------------------------------------------------
 	if(bnod_num!= 0) displacement_nonzero_value(0,1,bnod_num,ip,vp,P,R);		//处理位移非零值约束条件
 
-	//--------------------------parallel computing-------------------------------------------
+	//--------------------------parallel computing   2-------------------------------------------
 	RR0=0.0;
 	double MPI_RR0=0.0;
 	for(int i=myid; i<N1; i+=group_size)			//COMPUTE R(K)*R(K)
@@ -404,30 +418,37 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 		MPI_RR0=MPI_RR0+R[i]*R[i];
 	}
 	//MPI_Barrier(MPI_COMM_WORLD);
-	MPI_Allreduce(&MPI_RR0,&RR0,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-	//MPI_Bcast(&RR0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Reduce(&MPI_RR0,&RR0,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	MPI_Bcast(&RR0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	R0=sqrt(RR0);
 	//--------------------------------------------------------------------- 
 	//ENTER TO ITERATE                                                
 	//---------------------------------------------------------------------
 	while(K<Nup)
-	{
+	  {//cout<<"kkkkk"<<K<<endl;
 		K=K+1;
 		//---------------------------------------------------------------------
 		mabvm(N,N1,Iz,Ig,A,P,S);		//CALCULATE AP=A*P=>S
 
    		//---------------------------------------------------------------------
+
 		if(bnod_num!=0) displacement_nonzero_value(0,0,bnod_num,ip,vp,S,P);	//处理位移非零值约束条件
 
+	//---------------------------parallel computation  3---------------
 		APP=0.0;
-		for(int i=0; i<N1; i++)	//CALCULATE INNER PRODUCT (AP,P)                          
+		double APP0=0.0;
+		for(int i=myid; i<N1; i+=group_size)	//CALCULATE INNER PRODUCT (AP,P)                          
 		{
-			APP=APP+S[i]*P[i];
-		}                                    
-		AK=-RR0/APP;                                     
-		//---------------------------------------------------------------------
+			APP0=APP0+S[i]*P[i];
+		}  
+
+	       MPI_Reduce(&APP0,&APP,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	       MPI_Bcast(&APP,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+		   AK=-RR0/APP;    
+                                 
+	//---------------------------------------------------------------------
 		//CALCULATE X(K)=X(K-1)-AK*P(K)                  
-		//CALCULATE R(K)=R(K-1)+AK*AP(K)                
+		//CALCULATE R(K)=R(K-1)+AK*AP(K)     		
 		RRk=0.0;
 		for(int i=0; i<N1; i++)
 		{
@@ -435,6 +456,50 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 			R[i]=R[i]+AK*S[i];
 			RRk=RRk+R[i]*R[i];
 		}
+
+		   /*
+              
+             //-----------------------parallel computation  4------------------------------------
+		//CALCULATE X(K)=X(K-1)-AK*P(K)                  
+		//CALCULATE R(K)=R(K-1)+AK*AP(K) 
+		   	vector<double> XXX(3*N, 0);
+	        vector<double> RRR(3*N, 0);
+		RRk=0.0;
+		double RRk0=0.0;
+		for(int i=myid; i<N1; i+=group_size)
+		{
+			X[i]=X[i]-AK*P[i];
+			R[i]=R[i]+AK*S[i];
+			RRk0=RRk0+R[i]*R[i];
+			for(int j=0;j<N1;j++)
+				{if(j%group_size!=myid)
+				  {
+					X[j]=0;
+					R[j]=0;
+			      }
+			   }
+
+			
+		}
+		//if(myid==0)
+			//cout<<"X[0]-1:"<<X[0]<<endl<<endl;
+				
+        MPI_Reduce(&X[0],&XXX[0],N1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+		MPI_Reduce(&R[0],&RRR[0],N1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+		if(myid==0)
+		{
+			X=XXX;
+			R=RRR;
+			//cout<<"X[0]-2:"<<X[0]<<endl<<endl<<endl;
+			//cout<<"xxx[0]:"<<XXX[0]<<endl;
+		}
+		MPI_Bcast(&X[0],N1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+		MPI_Bcast(& R[0],N1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+                       
+	         MPI_Reduce(&RRk0,&RRk,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+	         MPI_Bcast(&RRk,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+           //-------------------------------------------------------------------------------------------
+           */   
 		Rk=sqrt(RRk);
 		if(fabs(Rk)>=Zero*fabs(R0))
 		{
@@ -448,6 +513,9 @@ void SolveEqu::Solve_linear_equations(const int &bnod_num, const int &N, const v
 		else	break;
 	}
 	if(K==Nup) hout << "注意！共轭梯度法解线性方程组迭代" <<K<< "次仍未收敛，请检查！" << endl;
+	//cout<<"kk22222222"<<K-1<<endl;
+
+
 }
 //---------------------------------------------------------------------------
 //(OpenMP)求解线性方程组函数(共轭梯度CONJUGATE GRADIENT METHOD)
